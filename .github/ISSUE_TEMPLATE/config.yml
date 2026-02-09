@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Preguntas y Soporte
+    url: https://github.com/MancoMen-Software-Studio/Observa/discussions
+    about: Usa GitHub Discussions para preguntas y soporte general

@@ -1,0 +1,8 @@
+* @MancoMen-Software-Studio/architects
+
+/src/**/Domain/ @MancoMen-Software-Studio/architects
+/src/**/Infrastructure/ @MancoMen-Software-Studio/architects
+/src/**/Api/ @MancoMen-Software-Studio/architects
+/docs/ @MancoMen-Software-Studio/developers
+/.github/ @MancoMen-Software-Studio/architects
+/Directory.Packages.props @MancoMen-Software-Studio/architects
