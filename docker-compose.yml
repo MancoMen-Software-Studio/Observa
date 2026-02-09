@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: observa-postgres
+    environment:
+      POSTGRES_USER: observa
+      POSTGRES_PASSWORD: observa
+      POSTGRES_DB: observa_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - observa-pgdata:/var/lib/postgresql/data
+
+volumes:
+  observa-pgdata:

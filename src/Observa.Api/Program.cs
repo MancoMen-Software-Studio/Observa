@@ -1,12 +1,14 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Observa.Api.Endpoints;
 using Observa.Api.Middleware;
 using Observa.Application;
 using Observa.Infrastructure;
+using Observa.Infrastructure.Persistence;
 using Observa.Infrastructure.RealTime;
 using Serilog;
 
@@ -36,6 +38,10 @@ try
     {
         app.UseSwagger();
         app.UseSwaggerUI();
+
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ObservaDbContext>();
+        dbContext.Database.Migrate();
     }
 
     app.UseExceptionHandler();

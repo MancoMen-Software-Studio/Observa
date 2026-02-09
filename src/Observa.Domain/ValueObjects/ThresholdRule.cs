@@ -10,11 +10,11 @@ namespace Observa.Domain.ValueObjects;
 /// </summary>
 public sealed class ThresholdRule : ValueObject
 {
-    private ThresholdRule(string metricName, double value, ThresholdOperator thresholdOperator, AlertSeverity severity)
+    private ThresholdRule(string metricName, double value, ThresholdOperator @operator, AlertSeverity severity)
     {
         MetricName = metricName;
         Value = value;
-        Operator = thresholdOperator;
+        Operator = @operator;
         Severity = severity;
     }
 
