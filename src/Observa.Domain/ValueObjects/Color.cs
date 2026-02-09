@@ -9,7 +9,7 @@ namespace Observa.Domain.ValueObjects;
 /// </summary>
 public sealed class Color : ValueObject
 {
-    private static readonly Regex HexPattern = new(@"^#([0-9A-Fa-f]{6})$", RegexOptions.Compiled);
+    private static readonly Regex s_hexPattern = new(@"^#([0-9A-Fa-f]{6})$", RegexOptions.Compiled);
 
     private Color(string hexValue)
     {
@@ -25,7 +25,7 @@ public sealed class Color : ValueObject
             return Result<Color>.Failure(ColorErrors.Empty);
         }
 
-        if (!HexPattern.IsMatch(hexValue))
+        if (!s_hexPattern.IsMatch(hexValue))
         {
             return Result<Color>.Failure(ColorErrors.InvalidFormat);
         }

@@ -46,6 +46,17 @@ dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
 dotnet_naming_symbols.non_field_members.applicable_kinds = property, method, event
 dotnet_naming_symbols.non_field_members.applicable_accessibilities = *
 
+dotnet_naming_rule.private_static_fields_should_be_camel_case_with_s_prefix.severity = error
+dotnet_naming_rule.private_static_fields_should_be_camel_case_with_s_prefix.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields_should_be_camel_case_with_s_prefix.style = camel_case_s_prefix
+
+dotnet_naming_symbols.private_static_fields.applicable_kinds = field
+dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_static_fields.required_modifiers = static
+
+dotnet_naming_style.camel_case_s_prefix.required_prefix = s_
+dotnet_naming_style.camel_case_s_prefix.capitalization = camel_case
+
 dotnet_naming_rule.private_fields_should_be_camel_case_with_underscore.severity = error
 dotnet_naming_rule.private_fields_should_be_camel_case_with_underscore.symbols = private_fields
 dotnet_naming_rule.private_fields_should_be_camel_case_with_underscore.style = camel_case_underscore
