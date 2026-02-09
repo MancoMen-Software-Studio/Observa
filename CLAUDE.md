@@ -86,6 +86,11 @@ dotnet ef database update --project src/Observa.Infrastructure --startup-project
 - Commits: Conventional Commits (feat:, fix:, docs:, refactor:, test:, chore:)
 - Siempre Pull Request para merge a main
 
+### Commits
+- NO incluir Co-Authored-By en los commits
+- Los commits pertenecen exclusivamente a MancoMen Software Studio
+- Repositorio: https://github.com/MancoMen-Software-Studio/Observa.git
+
 ### Seguridad
 - Nunca commitear secretos, claves API o connection strings
 - Usar appsettings.Development.json (gitignored) para configuracion local
