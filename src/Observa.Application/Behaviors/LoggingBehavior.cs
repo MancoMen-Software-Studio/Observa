@@ -39,7 +39,7 @@ public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRe
 
         s_logProcessing(_logger, requestName, null);
 
-        var result = await next();
+        var result = await next(cancellationToken);
 
         if (result.IsFailure)
         {

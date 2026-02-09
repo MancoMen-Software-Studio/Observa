@@ -29,7 +29,7 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
     {
         if (!_validators.Any())
         {
-            return await next();
+            return await next(cancellationToken);
         }
 
         var context = new ValidationContext<TRequest>(request);
@@ -44,7 +44,7 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
 
         if (failure is null)
         {
-            return await next();
+            return await next(cancellationToken);
         }
 
         return (TResponse)(object)Result.Failure(new Error(failure.PropertyName, failure.ErrorMessage));
