@@ -7,9 +7,9 @@ namespace Observa.Domain.Abstractions;
 /// Representa el resultado de una operacion que puede fallar.
 /// Encapsula exito o fallo sin usar excepciones para flujo de control.
 /// </summary>
-public sealed class Result
+public class Result
 {
-    private Result(bool isSuccess, Error error)
+    protected Result(bool isSuccess, Error error)
     {
         IsSuccess = isSuccess;
         Error = error;
@@ -34,23 +34,17 @@ public sealed class Result
 
 /// <summary>
 /// Resultado generico que contiene un valor en caso de exito.
+/// Hereda de Result para permitir su uso como constraint generico en behaviors.
 /// </summary>
-public sealed class Result<TValue>
+public sealed class Result<TValue> : Result
 {
     private readonly TValue? _value;
 
     private Result(TValue? value, bool isSuccess, Error error)
+        : base(isSuccess, error)
     {
         _value = value;
-        IsSuccess = isSuccess;
-        Error = error;
     }
-
-    public bool IsSuccess { get; }
-
-    public bool IsFailure => !IsSuccess;
-
-    public Error Error { get; }
 
     [NotNull]
     public TValue Value => IsSuccess
@@ -63,7 +57,7 @@ public sealed class Result<TValue>
         return new Result<TValue>(value, true, Error.None);
     }
 
-    public static Result<TValue> Failure(Error error)
+    public new static Result<TValue> Failure(Error error)
     {
         return new Result<TValue>(default, false, error);
     }
