@@ -13,6 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" VersionOverride="11.12.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" VersionOverride="11.12.0" />
+  <PackageReference Include="MediatR" VersionOverride="12.5.0" />
     <ProjectReference Include="..\Observa.Domain\Observa.Domain.csproj" />
     <ProjectReference Include="..\Observa.Application\Observa.Application.csproj" />
   </ItemGroup>
