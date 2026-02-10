@@ -33,9 +33,15 @@ public static class DashboardEndpoints
         group.MapDelete("/{id:guid}/widgets/{widgetId:guid}", RemoveWidget);
     }
 
-    private static async Task<IResult> GetAll(ISender sender, CancellationToken cancellationToken)
+    private static async Task<IResult> GetAll(
+        ISender sender,
+        CancellationToken cancellationToken,
+        int page = 1,
+        int pageSize = 20,
+        string? status = null,
+        string? search = null)
     {
-        var query = new GetAllDashboardsQuery();
+        var query = new GetAllDashboardsQuery(page, pageSize, status, search);
         var result = await sender.Send(query, cancellationToken);
 
         return result.IsSuccess

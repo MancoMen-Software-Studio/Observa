@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Observa.Application.Abstractions.Messaging;
+using Observa.Application.Abstractions.Notifications;
 using Observa.Domain.Abstractions;
 using Observa.Domain.Aggregates;
 using Observa.Domain.Entities;
@@ -32,11 +33,16 @@ public sealed class AddWidgetCommandHandler : ICommandHandler<AddWidgetCommand, 
 {
     private readonly IDashboardRepository _dashboardRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IDashboardNotificationService _notificationService;
 
-    public AddWidgetCommandHandler(IDashboardRepository dashboardRepository, IUnitOfWork unitOfWork)
+    public AddWidgetCommandHandler(
+        IDashboardRepository dashboardRepository,
+        IUnitOfWork unitOfWork,
+        IDashboardNotificationService notificationService)
     {
         _dashboardRepository = dashboardRepository;
         _unitOfWork = unitOfWork;
+        _notificationService = notificationService;
     }
 
     public async Task<Result<Guid>> Handle(AddWidgetCommand request, CancellationToken cancellationToken)
@@ -76,6 +82,8 @@ public sealed class AddWidgetCommandHandler : ICommandHandler<AddWidgetCommand, 
 
         _dashboardRepository.Update(dashboard);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _notificationService.NotifyWidgetAddedAsync(
+            request.DashboardId, widgetResult.Value.Id, cancellationToken);
 
         return Result<Guid>.Success(widgetResult.Value.Id);
     }

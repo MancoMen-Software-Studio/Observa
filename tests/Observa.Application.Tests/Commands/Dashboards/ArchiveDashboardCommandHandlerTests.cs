@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
+using Observa.Application.Abstractions.Notifications;
 using Observa.Application.Commands.Dashboards;
 using Observa.Domain.Abstractions;
 using Observa.Domain.Aggregates;
@@ -16,13 +17,15 @@ public sealed class ArchiveDashboardCommandHandlerTests
 {
     private readonly IDashboardRepository _dashboardRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IDashboardNotificationService _notificationService;
     private readonly ArchiveDashboardCommandHandler _handler;
 
     public ArchiveDashboardCommandHandlerTests()
     {
         _dashboardRepository = Substitute.For<IDashboardRepository>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
-        _handler = new ArchiveDashboardCommandHandler(_dashboardRepository, _unitOfWork);
+        _notificationService = Substitute.For<IDashboardNotificationService>();
+        _handler = new ArchiveDashboardCommandHandler(_dashboardRepository, _unitOfWork, _notificationService);
     }
 
     [Fact]

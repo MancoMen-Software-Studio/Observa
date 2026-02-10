@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Observa.Application.Commands.DataSources;
+using Observa.Application.Queries.DataSources;
 
 namespace Observa.Api.Endpoints;
 
@@ -18,10 +19,21 @@ public static class DataSourceEndpoints
         var group = app.MapGroup("/api/datasources")
             .WithTags("DataSources");
 
-        group.MapPost("/", Create);
+        group.MapGet("/", GetAllDataSources);
+        group.MapPost("/", CreateDataSource);
     }
 
-    private static async Task<IResult> Create(
+    private static async Task<IResult> GetAllDataSources(ISender sender, CancellationToken cancellationToken)
+    {
+        var query = new GetAllDataSourcesQuery();
+        var result = await sender.Send(query, cancellationToken);
+
+        return result.IsSuccess
+            ? Results.Ok(result.Value)
+            : Results.Problem(result.Error.Description, statusCode: 400);
+    }
+
+    private static async Task<IResult> CreateDataSource(
         CreateDataSourceCommand command,
         ISender sender,
         CancellationToken cancellationToken)

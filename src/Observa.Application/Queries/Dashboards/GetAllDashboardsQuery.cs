@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -5,20 +6,25 @@ using System.Threading.Tasks;
 using Observa.Application.Abstractions.Messaging;
 using Observa.Application.DTOs;
 using Observa.Domain.Abstractions;
+using Observa.Domain.Enums;
 using Observa.Domain.Repositories;
 
 namespace Observa.Application.Queries.Dashboards;
 
 /// <summary>
-/// Consulta para obtener todos los dashboards del sistema.
+/// Consulta paginada para obtener dashboards del sistema.
 /// </summary>
-public sealed record GetAllDashboardsQuery : IQuery<IReadOnlyCollection<DashboardResponse>>;
+public sealed record GetAllDashboardsQuery(
+    int Page = 1,
+    int PageSize = 20,
+    string? Status = null,
+    string? Search = null) : IQuery<PagedResponse<DashboardResponse>>;
 
 /// <summary>
-/// Handler que procesa la consulta de todos los dashboards.
+/// Handler que procesa la consulta paginada de dashboards.
 /// </summary>
 public sealed class GetAllDashboardsQueryHandler
-    : IQueryHandler<GetAllDashboardsQuery, IReadOnlyCollection<DashboardResponse>>
+    : IQueryHandler<GetAllDashboardsQuery, PagedResponse<DashboardResponse>>
 {
     private readonly IDashboardRepository _dashboardRepository;
 
@@ -27,13 +33,28 @@ public sealed class GetAllDashboardsQueryHandler
         _dashboardRepository = dashboardRepository;
     }
 
-    public async Task<Result<IReadOnlyCollection<DashboardResponse>>> Handle(
+    public async Task<Result<PagedResponse<DashboardResponse>>> Handle(
         GetAllDashboardsQuery request,
         CancellationToken cancellationToken)
     {
-        var dashboards = await _dashboardRepository.GetAllAsync(cancellationToken);
+        var page = Math.Max(1, request.Page);
+        var pageSize = Math.Clamp(request.PageSize, 1, 100);
 
-        var response = dashboards
+        DashboardStatus? statusFilter = null;
+        if (!string.IsNullOrWhiteSpace(request.Status) &&
+            Enum.TryParse<DashboardStatus>(request.Status, ignoreCase: true, out var parsed))
+        {
+            statusFilter = parsed;
+        }
+
+        var pagedResult = await _dashboardRepository.GetPagedAsync(
+            page,
+            pageSize,
+            statusFilter,
+            request.Search,
+            cancellationToken);
+
+        var items = pagedResult.Items
             .Select(d => new DashboardResponse(
                 d.Id,
                 d.Title,
@@ -58,6 +79,15 @@ public sealed class GetAllDashboardsQueryHandler
             .ToList()
             .AsReadOnly();
 
-        return Result<IReadOnlyCollection<DashboardResponse>>.Success(response);
+        var response = new PagedResponse<DashboardResponse>(
+            items,
+            pagedResult.TotalCount,
+            pagedResult.Page,
+            pagedResult.PageSize,
+            pagedResult.TotalPages,
+            pagedResult.HasNextPage,
+            pagedResult.HasPreviousPage);
+
+        return Result<PagedResponse<DashboardResponse>>.Success(response);
     }
 }

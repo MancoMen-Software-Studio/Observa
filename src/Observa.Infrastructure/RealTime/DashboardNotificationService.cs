@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Observa.Application.Abstractions.Notifications;
 
 namespace Observa.Infrastructure.RealTime;
 
@@ -15,6 +16,15 @@ public sealed class DashboardNotificationService : IDashboardNotificationService
     public DashboardNotificationService(IHubContext<DashboardHub> hubContext)
     {
         _hubContext = hubContext;
+    }
+
+    /// <summary>
+    /// Notifica a todos los clientes conectados que la lista global de dashboards cambio.
+    /// </summary>
+    public async Task NotifyDashboardListChangedAsync(CancellationToken cancellationToken = default)
+    {
+        await _hubContext.Clients.All
+            .SendAsync("DashboardListChanged", cancellationToken);
     }
 
     public async Task NotifyDashboardUpdatedAsync(Guid dashboardId, CancellationToken cancellationToken = default)
@@ -53,5 +63,18 @@ public sealed class DashboardNotificationService : IDashboardNotificationService
         await _hubContext.Clients
             .Group(dashboardId.ToString())
             .SendAsync("AlertTriggered", new { DashboardId = dashboardId, AlertId = alertId, Severity = severity }, cancellationToken);
+    }
+
+    /// <summary>
+    /// Envia datos actualizados de widgets al grupo SignalR del dashboard.
+    /// </summary>
+    public async Task NotifyWidgetDataUpdatedAsync(
+        Guid dashboardId,
+        object widgetData,
+        CancellationToken cancellationToken = default)
+    {
+        await _hubContext.Clients
+            .Group(dashboardId.ToString())
+            .SendAsync("WidgetDataUpdated", widgetData, cancellationToken);
     }
 }

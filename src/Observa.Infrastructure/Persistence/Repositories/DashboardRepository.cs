@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Observa.Domain.Abstractions;
 using Observa.Domain.Aggregates;
 using Observa.Domain.Enums;
 using Observa.Domain.Repositories;
@@ -38,6 +39,42 @@ public sealed class DashboardRepository : IDashboardRepository
             .ToListAsync(cancellationToken);
 
         return dashboards.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Obtiene dashboards paginados con filtros opcionales de estado y busqueda.
+    /// </summary>
+    public async Task<PagedResult<Dashboard>> GetPagedAsync(
+        int page,
+        int pageSize,
+        DashboardStatus? statusFilter = null,
+        string? searchTerm = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _dbContext.Dashboards
+            .Include(d => d.Widgets)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (statusFilter.HasValue)
+        {
+            query = query.Where(d => d.Status == statusFilter.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(d => EF.Functions.ILike(d.Title, $"%{searchTerm}%"));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderByDescending(d => d.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Dashboard>(items.AsReadOnly(), totalCount, page, pageSize);
     }
 
     public async Task<IReadOnlyCollection<Dashboard>> GetByStatusAsync(

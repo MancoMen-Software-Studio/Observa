@@ -127,3 +127,12 @@ docker-compose.override.yml
 *.tfstate.*
 *.tfvars
 !*.tfvars.example
+
+## k6 Load Test Results
+tests/load/results/
+
+## Node.js / Frontend
+node_modules/
+client/dist/
+client/.vite/
+*.tsbuildinfo

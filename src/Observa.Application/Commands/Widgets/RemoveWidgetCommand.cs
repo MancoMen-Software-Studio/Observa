@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Observa.Application.Abstractions.Messaging;
+using Observa.Application.Abstractions.Notifications;
 using Observa.Domain.Abstractions;
 using Observa.Domain.Aggregates;
 using Observa.Domain.Repositories;
@@ -20,11 +21,16 @@ public sealed class RemoveWidgetCommandHandler : ICommandHandler<RemoveWidgetCom
 {
     private readonly IDashboardRepository _dashboardRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IDashboardNotificationService _notificationService;
 
-    public RemoveWidgetCommandHandler(IDashboardRepository dashboardRepository, IUnitOfWork unitOfWork)
+    public RemoveWidgetCommandHandler(
+        IDashboardRepository dashboardRepository,
+        IUnitOfWork unitOfWork,
+        IDashboardNotificationService notificationService)
     {
         _dashboardRepository = dashboardRepository;
         _unitOfWork = unitOfWork;
+        _notificationService = notificationService;
     }
 
     public async Task<Result> Handle(RemoveWidgetCommand request, CancellationToken cancellationToken)
@@ -45,6 +51,8 @@ public sealed class RemoveWidgetCommandHandler : ICommandHandler<RemoveWidgetCom
 
         _dashboardRepository.Update(dashboard);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _notificationService.NotifyWidgetRemovedAsync(
+            request.DashboardId, request.WidgetId, cancellationToken);
 
         return Result.Success();
     }

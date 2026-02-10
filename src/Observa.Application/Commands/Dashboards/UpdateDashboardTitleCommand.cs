@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Observa.Application.Abstractions.Messaging;
+using Observa.Application.Abstractions.Notifications;
 using Observa.Domain.Abstractions;
 using Observa.Domain.Aggregates;
 using Observa.Domain.Repositories;
@@ -20,11 +21,16 @@ public sealed class UpdateDashboardTitleCommandHandler : ICommandHandler<UpdateD
 {
     private readonly IDashboardRepository _dashboardRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IDashboardNotificationService _notificationService;
 
-    public UpdateDashboardTitleCommandHandler(IDashboardRepository dashboardRepository, IUnitOfWork unitOfWork)
+    public UpdateDashboardTitleCommandHandler(
+        IDashboardRepository dashboardRepository,
+        IUnitOfWork unitOfWork,
+        IDashboardNotificationService notificationService)
     {
         _dashboardRepository = dashboardRepository;
         _unitOfWork = unitOfWork;
+        _notificationService = notificationService;
     }
 
     public async Task<Result> Handle(UpdateDashboardTitleCommand request, CancellationToken cancellationToken)
@@ -45,6 +51,8 @@ public sealed class UpdateDashboardTitleCommandHandler : ICommandHandler<UpdateD
 
         _dashboardRepository.Update(dashboard);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await _notificationService.NotifyDashboardUpdatedAsync(request.DashboardId, cancellationToken);
+        await _notificationService.NotifyDashboardListChangedAsync(cancellationToken);
 
         return Result.Success();
     }

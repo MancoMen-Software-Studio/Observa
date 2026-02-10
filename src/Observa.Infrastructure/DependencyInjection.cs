@@ -7,7 +7,9 @@ using Observa.Domain.Repositories;
 using Observa.Infrastructure.Caching;
 using Observa.Infrastructure.Persistence;
 using Observa.Infrastructure.Persistence.Repositories;
+using Observa.Application.Abstractions.Notifications;
 using Observa.Infrastructure.RealTime;
+using Observa.Infrastructure.Simulation;
 
 namespace Observa.Infrastructure;
 
@@ -63,5 +65,6 @@ public static class DependencyInjection
     private static void AddRealTime(this IServiceCollection services)
     {
         services.AddScoped<IDashboardNotificationService, DashboardNotificationService>();
+        services.AddHostedService<DataSimulationService>();
     }
 }
